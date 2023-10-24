@@ -29,6 +29,10 @@ sudo cp prometheus /usr/local/bin/
 sudo cp promtool /usr/local/bin/
 
 sudo mkdir /etc/prometheus
+sudo mkdir -p /etc/prometheus/rules
+sudo mkdir -p /etc/prometheus/rules.s
+sudo mkdir -p /etc/prometheus/files_sd
+
 sudo cp prometheus.yml /etc/prometheus/prometheus.yml
 
 
@@ -46,7 +50,7 @@ sudo chown prometheus:prometheus /usr/local/bin/prometheus
 sudo chown prometheus:prometheus /usr/local/bin/promtool
 
 
-sudo chown prometheus:prometheus /etc/prometheus
+sudo chown -R prometheus:prometheus /etc/prometheus
 sudo chown -R prometheus:prometheus /etc/prometheus/consoles
 sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
 sudo chown -R prometheus:prometheus /var/lib/prometheus
@@ -69,11 +73,15 @@ After=network-online.target
 User=prometheus
 Group=prometheus
 Type=simple
-ExecStart=/usr/local/bin/prometheus \ 
-        --config.file=/etc/prometheus/prometheus.yml \ 
-        --storage.tsdb.path=/var/lib/prometheus/data \ 
-        --web.console.templates=/etc/prometheus/consoles \ 
-        --web.console.libraries=/etc/prometheus/console_libraries
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus/data --web.console.templates=/etc/prometheus/consoles --web.console.libraries=/etc/prometheus/console_libraries --web.listen-address=0.0.0.0:9090 --web.external-url=
+
+
+SyslogIdentifier=prometheus
+Restart=always
+
+
+
 
 [Install]
 WantedBy=multi-user.target
@@ -122,7 +130,6 @@ vim /etc/prometheus/prometheus.yml
 
 ##############
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'node*exporter-local-server(prometheus-server)'
     scrape_interval: 5s
     static_configs:
@@ -131,8 +138,48 @@ scrape_configs:
 ##################
 
 
+```
+
+you can write a custom exporter with python and write a service for it.
 
 ```
+sudo vim /etc/systemd/system/node-exporter.service
+
+########################
+
+
+[Unit]
+Description=node-exporter
+Wants=network-online.target
+After=network-online.target
+
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/node_exporter
+
+SyslogIdentifier=prometheus
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target
+############
+
+
+sudo systemctl daemon-reload
+sudo systemctl start node-exporter.service 
+sudo systemctl status node-exporter.service
+
+```
+
+
+
+
+
 
 
 # Install Grafana
@@ -151,3 +198,8 @@ sudo systemctl start grafana-server
 sudo systemctl status grafana-server
 sudo systemctl enable grafana-server
 ```
+
+
+
+# Data Model in prometheus
+
