@@ -1,5 +1,5 @@
 # Prometheus
-Prometheus monitoring refers to the use of Prometheus, an open-source monitoring and alerting toolkit, to track and manage the performance and health of various systems and applications. Prometheus is widely used in the field of DevOps and is designed to help organizations gain insights into the behavior of their systems. Here's an overview of what Prometheus monitoring entails:
+Prometheus is an open-source monitoring and alerting toolkit, to track and manage the performance and health of various systems and applications. Prometheus is widely used in the field of DevOps and is designed to help organizations gain insights into the behavior of their systems. Here's an overview of what Prometheus monitoring entails:
 
 1. **Data Collection:** Prometheus collects time-series data from various sources. This data can include metrics about system performance, application behavior, and other aspects of the infrastructure. Prometheus uses a pull-based model, where it periodically scrapes data from endpoints called "exporters."
 
