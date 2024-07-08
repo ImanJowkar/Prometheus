@@ -33,6 +33,9 @@ sudo apt-get install grafana
 ## guied
 ```
 grafana-cli plugins install grafana-googlesheets-datasource
+grafana-cli plugins install alexanderzobnin-zabbix-app
+
+
 
 systemctl restart grafana-server.service
 
