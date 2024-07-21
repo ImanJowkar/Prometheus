@@ -21,73 +21,87 @@ Prometheus is popular for its simplicity, reliability, and ability to scale. It 
 
 go to the promethues website and download the promethues
 ```
+
+dnf install epel-release
+
+dnf install mtr tcpdump net-snmp-utils bind-utils sysstat  htop screen wget curl vim bash-completion traceroute telnet net-tools btop
+
+
 wget https://github.com/prometheus/prometheus/releases/download/v2.48.0-rc.0/prometheus-2.48.0-rc.0.linux-amd64.tar.gz
 
 tar xvf prometheus-2.48.0-rc.0.linux-amd64.tar.gz
 
-sudo cp prometheus /usr/local/bin/
-sudo cp promtool /usr/local/bin/
+
+
 
 sudo mkdir /etc/prometheus
-sudo mkdir -p /etc/prometheus/rules
-sudo mkdir -p /etc/prometheus/rules.s
-sudo mkdir -p /etc/prometheus/files_sd
+sudo mkdir -p /var/lib/prometheus
 
-sudo cp prometheus.yml /etc/prometheus/prometheus.yml
 
+# create prometheus user
+
+useradd prometheus -r -s /sbin/nologin -d /var/lib/prometheus/
 
 sudo cp -r consoles /etc/prometheus/
 sudo cp -r console_libraries/ /etc/prometheus/
+sudo cp prometheus.yml /etc/prometheus/prometheus.yml
+sudo cp prometheus /usr/local/bin/
+sudo cp promtool /usr/local/bin/
 
 
 
-
-# create prometheus use
-sudo groupadd --system prometheus
-sudo useradd -s /sbin/nologin --system -g prometheus prometheus
-
-sudo chown prometheus:prometheus /usr/local/bin/prometheus
-sudo chown prometheus:prometheus /usr/local/bin/promtool
+sudo chown -R prometheus:prometheus /var/lib/prometheus/
+sudo chown -R prometheus:prometheus /etc/prometheus/
 
 
-sudo chown -R prometheus:prometheus /etc/prometheus
-sudo chown -R prometheus:prometheus /etc/prometheus/consoles
-sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
-sudo chown -R prometheus:prometheus /var/lib/prometheus
+cat > /etc/prometheus/prometheus.yml << EOF
+# this is prom basic configuration
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+
+scrape_configs:
+  - job_name: "prometheus-srv"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+EOF
+
+
 
 
 
 # Create Service
-sudo vim /etc/systemd/system/prometheus.service
 
-################
-
+cat > /usr/lib/systemd/system/prometheus.service << EOF
 
 [Unit]
 Description=Prometheus
 Wants=network-online.target
 After=network-online.target
 
-
 [Service]
 User=prometheus
 Group=prometheus
 Type=simple
-ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus/data --web.console.templates=/etc/prometheus/consoles --web.console.libraries=/etc/prometheus/console_libraries --web.listen-address=0.0.0.0:9090 --web.external-url=
+ExecReload=/usr/bin/kill -HUP $MAINPID
+
+ExecStart=/usr/local/bin/prometheus \
+--config.file=/etc/prometheus/prometheus.yml \
+--storage.tsdb.path=/var/lib/prometheus/ \
+--web.console.templates=/etc/prometheus/consoles \
+--web.console.libraries=/etc/prometheus/console_libraries \
+--web.listen-address=0.0.0.0:9090
 
 
 SyslogIdentifier=prometheus
-Restart=always
-
-
-
+Restart=on-failure
+RestartSec=60s
 
 [Install]
 WantedBy=multi-user.target
+EOF
 
 
-##############
 
 
 
@@ -96,6 +110,10 @@ sudo systemctl enable prometheus
 sudo systemctl start prometheus
 
 ```
+
+
+
+
 
 # Install Node-Exporter
 
@@ -173,7 +191,7 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload
 sudo systemctl start node-exporter.service 
 sudo systemctl status node-exporter.service
-
+sudo systemctl enable node-exporter.service
 ```
 
 
