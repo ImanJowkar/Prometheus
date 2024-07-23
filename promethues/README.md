@@ -1,5 +1,6 @@
 # Prometheus
-Prometheus is an open-source monitoring and alerting toolkit, to track and manage the performance and health of various systems and applications. Prometheus is widely used in the field of DevOps and is designed to help organizations gain insights into the behavior of their systems. Here's an overview of what Prometheus monitoring entails:
+
+Prometheus is an open-source monitoring and alerting toolkit, to track and manage the performance and health of various systems and applications. Prometheus is widely used in the field of DevOps and is designed to help organizations gain insights into the behavior of their systems. 
 
 1. **Data Collection:** Prometheus collects time-series data from various sources. This data can include metrics about system performance, application behavior, and other aspects of the infrastructure. Prometheus uses a pull-based model, where it periodically scrapes data from endpoints called "exporters."
 
@@ -13,13 +14,15 @@ Prometheus is an open-source monitoring and alerting toolkit, to track and manag
 
 6. **Service Discovery:** Prometheus can dynamically discover and monitor new services and targets as they come online, making it well-suited for dynamic, cloud-native environments.
 
-Prometheus is popular for its simplicity, reliability, and ability to scale. It is commonly used for monitoring cloud-native applications, containerized environments, and microservices due to its adaptability and support for modern architectural patterns. It helps organizations ensure the availability, performance, and reliability of their systems by providing real-time insights and timely alerts when issues arise.
 
 
-# installation
+# installation of RHEL
 [ref](https://www.cherryservers.com/blog/install-prometheus-ubuntu)
 
 go to the promethues website and download the promethues
+
+[download-prometheus](https://github.com/prometheus/prometheus/releases)
+
 ```
 
 dnf install epel-release
@@ -34,7 +37,7 @@ tar xvf prometheus-2.48.0-rc.0.linux-amd64.tar.gz
 
 
 
-sudo mkdir /etc/prometheus
+sudo mkdir -p /etc/prometheus
 sudo mkdir -p /var/lib/prometheus
 
 
@@ -119,7 +122,7 @@ sudo systemctl start prometheus
 
 A Node Exporter is a small application that runs on the system you want to monitor and collects various metrics and information about the system's hardware and operating system. These metrics include details about CPU usage, memory usage, disk I/O, network statistics, and more. The Node Exporter then makes this information available to Prometheus for collection and analysis.
 
-Here are some key features and functions of a Node Exporter:
+
 
 1. **System Metrics Collection:** Node Exporters collect a wide range of system-level metrics, providing insights into the health and performance of the host system.
 
@@ -131,7 +134,6 @@ Here are some key features and functions of a Node Exporter:
 
 5. **Service Discovery:** Node Exporters can be configured to dynamically discover and scrape metrics from new hosts and services as they come online. This is particularly valuable in dynamic, cloud-native environments.
 
-Node Exporters are part of the broader Prometheus ecosystem and play a crucial role in monitoring infrastructure and applications. They help DevOps and IT teams gain insights into the resource utilization and performance of individual hosts, which is essential for troubleshooting issues, optimizing system resources, and ensuring the reliability and availability of systems.
 
 ```
 wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
