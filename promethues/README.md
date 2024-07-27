@@ -2,32 +2,76 @@
 
 Prometheus is an open-source monitoring and alerting toolkit, to track and manage the performance and health of various systems and applications. Prometheus is widely used in the field of DevOps and is designed to help organizations gain insights into the behavior of their systems. 
 
-1. **Data Collection:** Prometheus collects time-series data from various sources. This data can include metrics about system performance, application behavior, and other aspects of the infrastructure. Prometheus uses a pull-based model, where it periodically scrapes data from endpoints called "exporters."
-
-2. **Storage:** Prometheus stores the collected data in a time-series database. This database is optimized for efficient storage and querying of time-series data. Data retention policies can be configured to determine how long data is kept.
-
-3. **Data Querying:** Prometheus provides a query language called PromQL (Prometheus Query Language) that allows users to write custom queries to retrieve specific metrics or perform calculations on the data. PromQL is powerful and flexible, enabling users to gain insights into the system's behavior.
-
-4. **Alerting:** Prometheus allows you to set up alerting rules based on the data it collects. When a certain condition is met, an alert is triggered, and notifications can be sent to notify relevant parties about potential issues.
-
-5. **Visualization:** While Prometheus itself primarily focuses on data collection, storage, and querying, it is often used in conjunction with other tools, like Grafana, for data visualization. Grafana provides rich visualization capabilities to create dashboards and display Prometheus data in a user-friendly manner.
-
-6. **Service Discovery:** Prometheus can dynamically discover and monitor new services and targets as they come online, making it well-suited for dynamic, cloud-native environments.
 
 
 
-# installation of RHEL
+
+
 [ref](https://www.cherryservers.com/blog/install-prometheus-ubuntu)
 
 go to the promethues website and download the promethues
 
 [download-prometheus](https://github.com/prometheus/prometheus/releases)
 
+
+
+#### basic system configurations
 ```
+
+hostnamectl set-hostname prometheus-srv
 
 dnf install epel-release
 
 dnf install mtr tcpdump net-snmp-utils bind-utils sysstat  htop screen wget curl vim bash-completion traceroute telnet net-tools btop
+
+
+
+
+
+```
+
+#### Add a disk and set up LVM on it.
+I added two disk `sdc` and `sdd`
+
+```
+fdisk /dev/sdc
+fdisk /dev/sdd
+lsblk
+
+pvcreate /dev/sd[cd][1]
+vgcreate prometheus-vg /dev/sd[cd][1]
+echo $? ; pvs; vgs
+
+lvcreate -n prometheus-lv -l 100%FREE prometheus-vg
+echo $?; sync; lvs
+
+
+mkfs.ext4 /dev/prometheus-vg/prometheus-lv
+echo $?
+
+# open fstab and insert below to end of the file 
+
+vim /etc/fstab
+/dev/prometheus-vg/prometheus-lv   /prom-data   ext4    defaults        0       1
+
+
+mount -a
+systemctl daemon-reload
+
+
+
+
+```
+If the `/prom-data/` directory becomes full in the future, we can expand it using LVM.
+
+
+##### what is `sync` command: 
+
+The `sync` command in Linux is used to flush the file system buffers. When you modify files, these changes are often stored in memory and periodically written to disk to improve performance. The `sync` command ensures that all modified data in memory is written to the storage devices, making sure that the file system's state is consistent and all changes are saved.
+
+
+#### installation
+```
 
 
 wget https://github.com/prometheus/prometheus/releases/download/v2.48.0-rc.0/prometheus-2.48.0-rc.0.linux-amd64.tar.gz
@@ -36,14 +80,14 @@ tar xvf prometheus-2.48.0-rc.0.linux-amd64.tar.gz
 
 
 
-
 sudo mkdir -p /etc/prometheus
-sudo mkdir -p /var/lib/prometheus
+
 
 
 # create prometheus user
 
-useradd prometheus -r -s /sbin/nologin -d /var/lib/prometheus/
+useradd prometheus -r -s /sbin/nologin -d /prom-data/
+
 
 sudo cp -r consoles /etc/prometheus/
 sudo cp -r console_libraries/ /etc/prometheus/
@@ -53,8 +97,8 @@ sudo cp promtool /usr/local/bin/
 
 
 
-sudo chown -R prometheus:prometheus /var/lib/prometheus/
-sudo chown -R prometheus:prometheus /etc/prometheus/
+sudo chown -R prometheus: /prom-data/
+sudo chown -R prometheus: /etc/prometheus/
 
 
 cat > /etc/prometheus/prometheus.yml << EOF
@@ -90,7 +134,7 @@ ExecReload=/usr/bin/kill -HUP $MAINPID
 
 ExecStart=/usr/local/bin/prometheus \
 --config.file=/etc/prometheus/prometheus.yml \
---storage.tsdb.path=/var/lib/prometheus/ \
+--storage.tsdb.path=/prom-data/ \
 --web.console.templates=/etc/prometheus/consoles \
 --web.console.libraries=/etc/prometheus/console_libraries \
 --web.listen-address=0.0.0.0:9090
@@ -114,8 +158,17 @@ sudo systemctl start prometheus
 
 ```
 
+`Prometheus itself does not have a setting to change the time zone because it stores all data in UTC.`
+
+#### configure firewalld
+
+```
+firewall-cmd --add-port=9090/tcp --permanent
+firewall-cmd --reload
+firewall-cmd --list-all
 
 
+```
 
 
 # Install Node-Exporter
