@@ -124,16 +124,6 @@ A Node Exporter is a small application that runs on the system you want to monit
 
 
 
-1. **System Metrics Collection:** Node Exporters collect a wide range of system-level metrics, providing insights into the health and performance of the host system.
-
-2. **Prometheus Integration:** Node Exporters are designed to work seamlessly with Prometheus. They expose the collected metrics using the Prometheus exposition format, making it easy for Prometheus to scrape and store this data.
-
-3. **Exposition Formats:** Node Exporters can export metrics in various formats, including plaintext (the most common format for Prometheus), JSON, and Protobuf. This flexibility allows for integration with different monitoring systems.
-
-4. **Custom Metrics:** In addition to standard system metrics, Node Exporters can also be configured to collect custom metrics specific to your applications or services running on the host.
-
-5. **Service Discovery:** Node Exporters can be configured to dynamically discover and scrape metrics from new hosts and services as they come online. This is particularly valuable in dynamic, cloud-native environments.
-
 
 ```
 wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
