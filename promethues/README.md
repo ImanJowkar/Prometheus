@@ -182,62 +182,48 @@ A Node Exporter is a small application that runs on the system you want to monit
 wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
 
 tar xvf node_exporter-1.6.1.linux-amd64.tar.gz
+cd node_exporter-1.6.1.linux-amd64
 
-you can run in the tmux
+cp node_exporter /usr/local/bin/
 
-```
-
-for adding node exporter in promethues 
-```
-vim /etc/prometheus/prometheus.yml
-
-##############
-scrape_configs:
-  - job_name: 'node*exporter-local-server(prometheus-server)'
-    scrape_interval: 5s
-    static_configs:
-        - targets: ['<node-exporter>:9100']
-
-##################
+useradd node_exporter -r -s /sbin/nologin -c "node exporter user"
 
 
-```
 
-you can write a custom exporter with python and write a service for it.
+# Create Service
 
-```
-sudo vim /etc/systemd/system/node-exporter.service
-
-########################
-
+cat > /usr/lib/systemd/system/node-exporter.service << EOF
 
 [Unit]
-Description=node-exporter
-Wants=network-online.target
+Description=Prometheus
 After=network-online.target
 
-
 [Service]
+User=node_exporter
+Group=node_exporter
 Type=simple
-User=prometheus
-Group=prometheus
-ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/usr/local/bin/node_exporter
 
-SyslogIdentifier=prometheus
-Restart=always
+
+ExecStart=/usr/local/bin/node_exporter 
 
 
 [Install]
 WantedBy=multi-user.target
-############
+EOF
+
+
 
 
 sudo systemctl daemon-reload
-sudo systemctl start node-exporter.service 
-sudo systemctl status node-exporter.service
 sudo systemctl enable node-exporter.service
+sudo systemctl start node-exporter.service
+
+
+
 ```
+
+
+
 
 
 
