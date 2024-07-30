@@ -205,7 +205,9 @@ Type=simple
 
 
 ExecStart=/usr/local/bin/node_exporter 
-
+SyslogIdentifier=node_exporter
+Restart=on-failure
+RestartSec=60s
 
 [Install]
 WantedBy=multi-user.target
