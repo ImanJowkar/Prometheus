@@ -1,13 +1,10 @@
 # Prometheus
 
-Prometheus is an open-source monitoring and alerting toolkit, to track and manage the performance and health of various systems and applications. Prometheus is widely used in the field of DevOps and is designed to help organizations gain insights into the behavior of their systems. 
 
 
 
 
-
-
-[ref](https://www.cherryservers.com/blog/install-prometheus-ubuntu)
+[Installation refrence](https://www.cherryservers.com/blog/install-prometheus-ubuntu)
 
 go to the promethues website and download the promethues
 
@@ -223,34 +220,3 @@ sudo systemctl start node-exporter.service
 
 
 ```
-
-
-
-
-
-
-
-
-
-
-# Install Grafana
-install oss(open source) version
-
-[ref](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-grafana-on-ubuntu-22-04)
-
-```
-wget -q -O - https://packages.grafana.com/gpg.key | gpg --dearmor | sudo tee /usr/share/keyrings/grafana.gpg > /dev/null
-
-echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
-
-sudo apt update
-sudo apt install grafana
-sudo systemctl start grafana-server
-sudo systemctl status grafana-server
-sudo systemctl enable grafana-server
-```
-
-
-
-# Data Model in prometheus
-
