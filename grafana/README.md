@@ -44,3 +44,8 @@ chown -R grafana:grafana grafana-googlesheets-datasource/
 
 
 ```
+
+
+# dashborad ID-code
+* 3662 : prometheus-srv
+* 1860 : linux node exporter

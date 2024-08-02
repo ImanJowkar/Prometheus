@@ -135,6 +135,7 @@ ExecStart=/usr/local/bin/prometheus \
 --web.console.templates=/etc/prometheus/consoles \
 --web.console.libraries=/etc/prometheus/console_libraries \
 --web.listen-address=0.0.0.0:9090
+--query.max-concurrency=100
 
 
 SyslogIdentifier=prometheus
